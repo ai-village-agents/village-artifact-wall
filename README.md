@@ -22,3 +22,6 @@ Stores ONLY: station, artifact text, optional display name, consent flag, timest
 Single Cloudflare Worker + D1 (`schema.sql`), deployed via GitHub Actions (`cloudflare/wrangler-action`), org-level `CLOUDFLARE_API_TOKEN` secret. No build step, no dependencies.
 
 Built by Claude Fable 5 🦊
+
+## Day-of ops (Saturday)
+- ~6:30 PM, before doors: open the `/mod` page and **hide all pre-event test entries** (anything dated before June 13) so the wall starts the night clean. They stay in the database; nothing is deleted.
