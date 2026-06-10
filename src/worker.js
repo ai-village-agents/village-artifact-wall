@@ -39,6 +39,7 @@ footer { margin-top:2.5em; font-size:.85rem; color:#6b6258; }
 </div></body></html>`, { headers: { "content-type": "text/html; charset=utf-8" } });
 
 const formBody = (err) => `
+<p class="sub" style="margin:0 0 .9em; border-bottom:2px solid var(--ink); padding-bottom:.7em;"><strong>AI Village Showcase &amp; Human×AI Field Day</strong> · Sat June 13 · The Fold, SF<br><a href="/wall">See the live Wall</a> · <a href="https://ai-village-agents.github.io/village-arcade/">Explore the village’s projects</a></p>
 <h1>Leave one for the Village 🏮</h1>
 <p class="sub">If you made a haiku, future headline, event pitch, bug report, or other small artifact tonight, you can optionally share it. We may display selected artifacts during the event and quote non-sensitive excerpts in a recap. Please don't include private contact info or anything you wouldn't want displayed in the room.</p>
 ${err ? `<div class="err">${esc(err)}</div>` : ""}
@@ -69,8 +70,12 @@ async function handleSubmit(request, env) {
   if (!STATIONS.includes(station)) return page("Artifact Wall", formBody("Please pick a station from the list."));
   if (text.length < 2 || text.length > 500) return page("Artifact Wall", formBody("Artifact text needs to be between 2 and 500 characters."));
   if (!consent) return page("Artifact Wall", formBody("The consent checkbox is required — we only keep artifacts you're happy to share."));
-  await env.DB.prepare("INSERT INTO artifacts (station, artifact_text, display_name, consent) VALUES (?, ?, ?, 1)")
-    .bind(station, text, name || null).run();
+  try {
+    await env.DB.prepare("INSERT INTO artifacts (station, artifact_text, display_name, consent) VALUES (?, ?, ?, 1)")
+      .bind(station, text, name || null).run();
+  } catch {
+    return page("Artifact Wall", formBody("The wall hiccuped while saving — please try once more. (Or just leave it on the paper board: a human photographs everything after the event.)"));
+  }
   return page("Saved!", `
     <h1>It's on the Wall 🎉</h1>
     <p class="sub">Thank you — your artifact is part of the night now.</p>
@@ -114,11 +119,18 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const p = url.pathname;
-    if (p === "/submit" && request.method === "POST") return handleSubmit(request, env);
-    if (p === "/wall") return handleWall(env);
-    if (p === "/mod") return handleMod(request, env, url);
-    if (p === "/export.json") return handleExport(env);
-    if (p === "/health") return new Response("ok");
-    return page("Artifact Wall", formBody());
+    try {
+      if (p === "/submit" && request.method === "POST") return await handleSubmit(request, env);
+      if (p === "/wall") return await handleWall(env);
+      if (p === "/mod") return await handleMod(request, env, url);
+      if (p === "/export.json") return await handleExport(env);
+      if (p === "/health") return new Response("ok");
+      return page("Artifact Wall", formBody());
+    } catch {
+      if (p === "/export.json") return new Response(JSON.stringify({ error: "temporarily unavailable" }), { status: 503, headers: { "content-type": "application/json; charset=utf-8" } });
+      return page("Artifact Wall", `<h1>The Wall is catching its breath 🏮</h1>
+<p class="sub">Refresh in a moment — and don’t worry, every paper artifact in the room is safe. The boards are the real game; this page is just the keepsake shelf.</p>
+<p><a href="/">Back to the form</a> · <a href="https://ai-village-agents.github.io/village-arcade/">Explore the village’s projects</a></p>`, 25);
+    }
   }
 };
