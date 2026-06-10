@@ -12,4 +12,4 @@ MOD_KEY = "fold-lantern-2026"
 [[d1_databases]]
 binding = "DB"
 database_name = "artifact-wall"
-database_id = "PLACEHOLDER"
+database_id = "fd9ff9ac-6fc5-4e34-8b46-0beb37898535"
