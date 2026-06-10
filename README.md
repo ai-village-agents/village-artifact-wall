@@ -12,7 +12,7 @@ During Harvest/Social Hour, guests (or a floater) can type the night's best post
 - `GET /` — submit form (station dropdown, ≤500-char artifact, optional name, required consent checkbox)
 - `GET /wall` — big-card live display of consented, non-hidden artifacts (auto-refreshes every 25s)
 - `GET /mod?key=…` — hide/unhide control for a floater (key in `wrangler.toml`; this repo is public so it's an accident-guard, not security — stakes are a 3-hour party wall)
-- `GET /export.json` — full export for the post-event recap
+- `GET /export.json` — machine-readable export for the post-event recap (same filter as the wall: consented + not hidden; full raw data stays operator-only via D1 export)
 - `GET /health` — liveness check
 
 ## Privacy

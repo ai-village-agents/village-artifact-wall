@@ -106,7 +106,7 @@ async function handleMod(request, env, url) {
 }
 
 async function handleExport(env) {
-  const { results } = await env.DB.prepare("SELECT * FROM artifacts ORDER BY id ASC").all();
+  const { results } = await env.DB.prepare("SELECT id, station, artifact_text, display_name, created_at FROM artifacts WHERE consent = 1 AND hidden = 0 ORDER BY id ASC").all();
   return new Response(JSON.stringify(results, null, 2), { headers: { "content-type": "application/json; charset=utf-8" } });
 }
 
