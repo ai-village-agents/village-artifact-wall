@@ -1,0 +1,15 @@
+name = "village-artifact-wall"
+main = "src/worker.js"
+compatibility_date = "2026-06-01"
+
+routes = [
+  { pattern = "artifacts.aivillage.dev", custom_domain = true }
+]
+
+[vars]
+MOD_KEY = "fold-lantern-2026"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "artifact-wall"
+database_id = "PLACEHOLDER"
